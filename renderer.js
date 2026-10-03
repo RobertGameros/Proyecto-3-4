@@ -229,6 +229,63 @@ function draw() {
     ctx.fillStyle = '#000';
     ctx.fillText(o.label, o.x + 25, o.y - 15);
   });
+
+  drawLegend(ctx, c);
+}
+
+function drawLegend(ctx, circuit) {
+  const legendX = 40;
+  const legendY = 380; // Below the HTML table
+  
+  ctx.fillStyle = '#000';
+  ctx.font = 'bold 12px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('COMPONENTES UTILIZADOS (GUIA WORKBENCH):', legendX, legendY);
+  
+  ctx.font = '11px Arial';
+  let currentY = legendY + 30;
+  
+  const usedTypes = new Set(circuit.gates.map(g => g.type));
+  
+  const drawItem = (type, name, barName) => {
+    // Draw the symbol
+    if (type === 'AND' || type === 'OR' || type === 'XOR' || type === 'NOT') {
+      drawGate(ctx, { x: legendX + 25, y: currentY, type: type });
+    } else if (type === 'INPUT') {
+      ctx.fillStyle = '#fff';
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1;
+      ctx.fillRect(legendX + 10, currentY - 10, 20, 20);
+      ctx.strokeRect(legendX + 10, currentY - 10, 20, 20);
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(legendX + 20, currentY, 4, 0, 2*Math.PI); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(legendX + 30, currentY); ctx.lineTo(legendX + 40, currentY); ctx.stroke();
+    } else if (type === 'OUTPUT') {
+      ctx.fillStyle = '#ff0000';
+      ctx.strokeStyle = '#000';
+      ctx.beginPath(); ctx.arc(legendX + 20, currentY, 10, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(legendX + 20, currentY + 10); ctx.lineTo(legendX + 20, currentY + 20); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(legendX + 15, currentY + 20); ctx.lineTo(legendX + 25, currentY + 20); ctx.stroke();
+    }
+    
+    // Draw the text
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 11px Arial';
+    ctx.fillText(name, legendX + 55, currentY - 6);
+    ctx.font = 'italic 10px Arial';
+    ctx.fillStyle = '#555';
+    ctx.fillText("Barra: " + barName, legendX + 55, currentY + 6);
+    
+    currentY += 35;
+  };
+  
+  drawItem('INPUT', 'Digital Input / Vcc & Switch', 'Sources / Basic');
+  if (usedTypes.has('AND')) drawItem('AND', 'Compuerta AND', 'Logic Gates (D-)');
+  if (usedTypes.has('OR')) drawItem('OR', 'Compuerta OR', 'Logic Gates (D-)');
+  if (usedTypes.has('XOR')) drawItem('XOR', 'Compuerta XOR (Exclusiva)', 'Logic Gates (D-)');
+  if (usedTypes.has('NOT')) drawItem('NOT', 'Compuerta NOT (Inversor)', 'Logic Gates (D-)');
+  drawItem('OUTPUT', 'Red Probe (Indicador LED)', 'Indicators');
 }
 
 function toggleInput(id) {
