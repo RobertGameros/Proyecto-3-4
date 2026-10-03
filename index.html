@@ -211,26 +211,53 @@
       cursor: pointer;
     }
     
-    #floating-table {
+    #panels-container {
       position: absolute;
-      top: 60px;
+      top: 40px;
       left: 20px;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
       pointer-events: none;
       user-select: none;
       z-index: 5;
     }
+
+    .floating-panel {
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #000;
+      padding: 10px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
     
-    #floating-table table {
+    .floating-panel table {
       border-collapse: collapse;
       text-align: center;
     }
-    
-    #floating-table th, #floating-table td {
+    .floating-panel th, .floating-panel td {
       padding: 2px 8px;
     }
+
+    .legend-table td {
+      text-align: left;
+      padding: 4px;
+      border-bottom: 1px solid #ccc;
+      font-size: 11px;
+    }
+    .legend-icon {
+      width: 20px; height: 20px;
+      display: inline-block;
+      vertical-align: middle;
+      border: 1px solid #888;
+      background: #f0f0f0;
+      text-align: center;
+      line-height: 20px;
+      font-weight: bold;
+    }
+    .legend-red-probe { color: red; }
+    .legend-logic { color: blue; }
   </style>
 </head>
 <body>
@@ -296,11 +323,10 @@
       <div class="comp-group"><div class="tool-btn" style="font-weight:bold;">M</div><div class="dropdown-arrow">▼</div></div>
       
       <div style="flex-grow: 1;"></div>
-      <button id="btn-toggle-mode" class="btn-mode">Cambiar a XS3 -> Gray</button>
+      <button id="btn-toggle-mode" class="btn-mode" style="pointer-events: auto;">Cambiar a XS3 -> Gray</button>
     </div>
 
-    <!-- Power Switch on absolute right -->
-    <div class="power-switch-container">
+    <div class="power-switch-container" style="pointer-events: auto;">
       <div class="power-switch" id="power-switch">
         <span class="power-label-0">0</span>
         <div class="switch-toggle off" id="switch-toggle"></div>
@@ -314,26 +340,48 @@
     <div class="inner-window">
       <div id="file-title" class="inner-title">convertidor de codigo gray a xs3 final.ewb</div>
       
-      <div id="floating-table">
-        <div style="text-align: center; margin-bottom: 15px;">TABLAS DE CONVERSIONES</div>
-        <table>
-          <thead>
-            <tr><th colspan="4" style="padding-bottom:10px;">GRAY</th><th style="padding: 0 20px;">DEC</th><th colspan="4">X S 3</th></tr>
-            <tr><th>D</th><th>C</th><th>B</th><th>A</th><th></th><th>W</th><th>X</th><th>Y</th><th>Z</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
-            <tr><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
-            <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>2</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
-            <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>3</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
-            <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>4</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
-            <tr><td>0</td><td>1</td><td>1</td><td>1</td><td>5</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
-            <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>6</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
-            <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>7</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
-            <tr><td>1</td><td>1</td><td>0</td><td>0</td><td>8</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
-            <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>9</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
-          </tbody>
-        </table>
+      <div id="panels-container">
+        <!-- Tabla de Conversiones -->
+        <div class="floating-panel">
+          <div style="text-align: center; font-weight:bold; margin-bottom: 5px;">TABLAS DE CONVERSIONES</div>
+          <table>
+            <thead>
+              <tr><th colspan="4" style="padding-bottom:5px;">GRAY</th><th style="padding: 0 10px;">DEC</th><th colspan="4">X S 3</th></tr>
+              <tr><th>D</th><th>C</th><th>B</th><th>A</th><th></th><th>W</th><th>X</th><th>Y</th><th>Z</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>2</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>3</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+              <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>4</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>1</td><td>1</td><td>1</td><td>5</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>6</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+              <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>7</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+              <tr><td>1</td><td>1</td><td>0</td><td>0</td><td>8</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+              <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>9</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Leyenda de Componentes -->
+        <div class="floating-panel">
+          <div style="text-align: center; font-weight:bold; margin-bottom: 5px; color:#000080;">GUÍA PARA REPLICAR EN WORKBENCH</div>
+          <table class="legend-table">
+            <tr>
+              <td><span class="legend-icon" style="font-size:16px;">⏚</span></td>
+              <td><b>Interruptor / Vcc / Ground</b><br><i>Barra: Sources / Basic</i><br>Usa entradas digitales (0/1) para A, B, C, D.</td>
+            </tr>
+            <tr>
+              <td><span class="legend-icon legend-logic">D-</span></td>
+              <td><b>Compuertas: AND, OR, XOR, NOT</b><br><i>Barra: Logic Gates</i><br>Usa compuertas estándar de 2 entradas.</td>
+            </tr>
+            <tr>
+              <td><span class="legend-icon legend-red-probe">💡</span></td>
+              <td><b>Red Probe (Indicador Rojo)</b><br><i>Barra: Indicators</i><br>Conecta a las salidas W, X, Y, Z.</td>
+            </tr>
+          </table>
+        </div>
       </div>
 
       <canvas id="circuitCanvas"></canvas>
