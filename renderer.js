@@ -198,7 +198,12 @@ function draw() {
     drawWire(ctx, outPos.x, outPos.y, o.x - 20, o.y, vals[o.in], wireIdx++);
   });
 
-  c.gates.forEach(g => drawGate(ctx, g));
+  c.gates.forEach(g => {
+    drawGate(ctx, g);
+    ctx.font = '10px Arial';
+    ctx.fillStyle = '#000';
+    ctx.fillText(g.type + ' GATE', g.x, g.y + 25);
+  });
   
   c.inputs.forEach(i => {
     // The visual state of the switch is always preserved
@@ -211,9 +216,13 @@ function draw() {
     ctx.fillStyle = val ? '#ff00ff' : '#000';
     ctx.beginPath(); ctx.arc(i.x, val ? i.y - 5 : i.y + 5, 4, 0, 2*Math.PI); ctx.fill();
     ctx.fillStyle = '#000';
+    ctx.font = '12px Arial';
     ctx.fillText(i.label, i.x - 25, i.y);
     ctx.fillStyle = '#888';
     ctx.fillText('[' + i.id + ']', i.x - 45, i.y);
+    ctx.font = '10px Arial';
+    ctx.fillStyle = '#000';
+    ctx.fillText('INPUT', i.x, i.y + 20);
   });
   
   c.outputs.forEach(o => {
@@ -227,65 +236,94 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(o.x - 5, o.y + 20); ctx.lineTo(o.x + 5, o.y + 20); ctx.stroke();
     
     ctx.fillStyle = '#000';
-    ctx.fillText(o.label, o.x + 25, o.y - 15);
+    ctx.font = '12px Arial';
+    
+    let colorName = val && powerOn ? 'RED' : 'WHITE';
+    let ledName = val && powerOn ? 'LED' : 'PROBE';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${colorName} ${ledName} ${o.label}`, o.x + 20, o.y);
+    ctx.textAlign = 'center';
   });
 
-  drawLegend(ctx, c);
+  drawLegendGrid(ctx);
 }
 
-function drawLegend(ctx, circuit) {
-  const legendX = 40;
-  const legendY = 380; // Below the HTML table
+function drawLegendGrid(ctx) {
+  const startX = 650;
+  const startY = 480; // Bottom right area
+  const cellH = 20;
+  
+  ctx.fillStyle = '#f0f0f0';
+  ctx.fillRect(startX, startY, 400, cellH * 5);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(startX, startY, 400, cellH * 5);
   
   ctx.fillStyle = '#000';
-  ctx.font = 'bold 12px Arial';
-  ctx.textAlign = 'left';
-  ctx.fillText('COMPONENTES UTILIZADOS (GUIA WORKBENCH):', legendX, legendY);
+  ctx.font = 'bold 11px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('LEYENDA DE COMPONENTES', startX + 200, startY + 14);
   
-  ctx.font = '11px Arial';
-  let currentY = legendY + 30;
+  ctx.beginPath(); ctx.moveTo(startX, startY + cellH); ctx.lineTo(startX + 400, startY + cellH); ctx.stroke();
   
-  const usedTypes = new Set(circuit.gates.map(g => g.type));
+  // Columns X offsets
+  const col1 = startX;
+  const col2 = startX + 40;
+  const col3 = startX + 80;
+  const col4 = startX + 220;
+  const col5 = startX + 260;
+  const col6 = startX + 310;
   
-  const drawItem = (type, name, barName) => {
-    // Draw the symbol
-    if (type === 'AND' || type === 'OR' || type === 'XOR' || type === 'NOT') {
-      drawGate(ctx, { x: legendX + 25, y: currentY, type: type });
-    } else if (type === 'INPUT') {
-      ctx.fillStyle = '#fff';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1;
-      ctx.fillRect(legendX + 10, currentY - 10, 20, 20);
-      ctx.strokeRect(legendX + 10, currentY - 10, 20, 20);
-      ctx.fillStyle = '#000';
-      ctx.beginPath(); ctx.arc(legendX + 20, currentY, 4, 0, 2*Math.PI); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(legendX + 30, currentY); ctx.lineTo(legendX + 40, currentY); ctx.stroke();
-    } else if (type === 'OUTPUT') {
-      ctx.fillStyle = '#ff0000';
-      ctx.strokeStyle = '#000';
-      ctx.beginPath(); ctx.arc(legendX + 20, currentY, 10, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(legendX + 20, currentY + 10); ctx.lineTo(legendX + 20, currentY + 20); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(legendX + 15, currentY + 20); ctx.lineTo(legendX + 25, currentY + 20); ctx.stroke();
+  const drawRow = (rowIdx, icon1, name1, desc1, icon2, name2, desc2) => {
+    const y = startY + cellH * (rowIdx + 1);
+    ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(startX + 400, y); ctx.stroke();
+    
+    // Vertical dividers
+    ctx.beginPath();
+    ctx.moveTo(col2, startY + cellH); ctx.lineTo(col2, startY + cellH * 5);
+    ctx.moveTo(col3, startY + cellH); ctx.lineTo(col3, startY + cellH * 5);
+    ctx.moveTo(col4, startY + cellH); ctx.lineTo(col4, startY + cellH * 5);
+    ctx.moveTo(col5, startY + cellH); ctx.lineTo(col5, startY + cellH * 5);
+    ctx.moveTo(col6, startY + cellH); ctx.lineTo(col6, startY + cellH * 4); // Only to row 3 for the second column
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.font = '11px Arial';
+    ctx.fillStyle = '#000';
+    
+    // Draw Col 1
+    if (name1) {
+      if (icon1 === 'XOR' || icon1 === 'AND' || icon1 === 'OR' || icon1 === 'NOT') {
+        drawGate(ctx, { x: col1 + 25, y: y + 10, type: icon1 });
+      }
+      ctx.fillText(name1, col2 + 5, y + 14);
+      ctx.fillText(desc1, col3 + 5, y + 14);
     }
     
-    // Draw the text
-    ctx.fillStyle = '#000';
-    ctx.textAlign = 'left';
-    ctx.font = 'bold 11px Arial';
-    ctx.fillText(name, legendX + 55, currentY - 6);
-    ctx.font = 'italic 10px Arial';
-    ctx.fillStyle = '#555';
-    ctx.fillText("Barra: " + barName, legendX + 55, currentY + 6);
-    
-    currentY += 35;
+    // Draw Col 2
+    if (name2) {
+      if (icon2 === 'PROBE') {
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(col4 + 20, y + 10, 6, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+      } else if (icon2 === 'INPUT') {
+        ctx.strokeRect(col4 + 10, y + 2, 16, 16);
+        ctx.beginPath(); ctx.arc(col4 + 18, y + 10, 2, 0, 2*Math.PI); ctx.fill();
+      } else if (icon2 === 'GROUND') {
+        ctx.beginPath(); ctx.moveTo(col4+20, y+4); ctx.lineTo(col4+20, y+10);
+        ctx.moveTo(col4+10, y+10); ctx.lineTo(col4+30, y+10);
+        ctx.moveTo(col4+14, y+13); ctx.lineTo(col4+26, y+13);
+        ctx.moveTo(col4+18, y+16); ctx.lineTo(col4+22, y+16);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#000';
+      ctx.fillText(name2, col5 + 5, y + 14);
+      ctx.fillText(desc2, col6 + 5, y + 14);
+    }
   };
-  
-  drawItem('INPUT', 'Digital Input / Vcc & Switch', 'Sources / Basic');
-  if (usedTypes.has('AND')) drawItem('AND', 'Compuerta AND', 'Logic Gates (D-)');
-  if (usedTypes.has('OR')) drawItem('OR', 'Compuerta OR', 'Logic Gates (D-)');
-  if (usedTypes.has('XOR')) drawItem('XOR', 'Compuerta XOR (Exclusiva)', 'Logic Gates (D-)');
-  if (usedTypes.has('NOT')) drawItem('NOT', 'Compuerta NOT (Inversor)', 'Logic Gates (D-)');
-  drawItem('OUTPUT', 'Red Probe (Indicador LED)', 'Indicators');
+
+  drawRow(0, 'XOR', 'XOR', 'Logic Exclusive-OR Gate', 'PROBE', 'Probe', 'Logic Monitor');
+  drawRow(1, 'AND', 'AND', 'Logic AND Gate', 'INPUT', 'Input', 'Logical Input');
+  drawRow(2, 'OR',  'OR',  'Logic OR Gate', 'GROUND', 'Ground', 'Earth Connection');
+  drawRow(3, 'NOT', 'NOT', 'Logic Inverter Gate', null, '', '');
 }
 
 function toggleInput(id) {
