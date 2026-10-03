@@ -206,23 +206,57 @@ function draw() {
   });
   
   c.inputs.forEach(i => {
-    // The visual state of the switch is always preserved
     const val = inputValues[i.id];
-    ctx.fillStyle = '#fff';
+    
+    // Switch Common Terminal (Right side)
+    ctx.fillStyle = '#000';
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 1;
-    ctx.fillRect(i.x - 10, i.y - 10, 20, 20);
-    ctx.strokeRect(i.x - 10, i.y - 10, 20, 20);
-    ctx.fillStyle = val ? '#ff00ff' : '#000';
-    ctx.beginPath(); ctx.arc(i.x, val ? i.y - 5 : i.y + 5, 4, 0, 2*Math.PI); ctx.fill();
+    ctx.beginPath(); ctx.arc(i.x, i.y, 2, 0, 2*Math.PI); ctx.fill();
+    
+    // Switch High Terminal (Vcc)
+    ctx.beginPath(); ctx.arc(i.x - 20, i.y - 15, 2, 0, 2*Math.PI); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(i.x - 20, i.y - 15); ctx.lineTo(i.x - 20, i.y - 25); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(i.x - 25, i.y - 25); ctx.lineTo(i.x - 15, i.y - 25); ctx.stroke(); // Vcc Bar
+    ctx.font = '9px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('12V', i.x - 20, i.y - 28);
+    
+    // Switch Low Terminal (Ground)
+    ctx.beginPath(); ctx.arc(i.x - 20, i.y + 15, 2, 0, 2*Math.PI); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(i.x - 20, i.y + 15); ctx.lineTo(i.x - 20, i.y + 25); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(i.x - 26, i.y + 25); ctx.lineTo(i.x - 14, i.y + 25); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(i.x - 22, i.y + 28); ctx.lineTo(i.x - 18, i.y + 28); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(i.x - 20, i.y + 31); ctx.lineTo(i.x - 20, i.y + 32); ctx.stroke();
+    
+    // Switch Blade
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(i.x, i.y);
+    if (val) {
+      ctx.lineTo(i.x - 18, i.y - 13);
+    } else {
+      ctx.lineTo(i.x - 18, i.y + 13);
+    }
+    ctx.stroke();
+    
+    // Connection wire going to the circuit
+    ctx.strokeStyle = val && powerOn ? '#ff00ff' : '#000';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(i.x, i.y); ctx.lineTo(i.x + 14, i.y); ctx.stroke();
+
+    // Text labels
     ctx.fillStyle = '#000';
-    ctx.font = '12px Arial';
-    ctx.fillText(i.label, i.x - 25, i.y);
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 12px Arial';
+    ctx.fillText(i.label, i.x - 32, i.y + 4);
     ctx.fillStyle = '#888';
-    ctx.fillText('[' + i.id + ']', i.x - 45, i.y);
+    ctx.fillText('[' + i.id + ']', i.x - 48, i.y + 4);
     ctx.font = '10px Arial';
     ctx.fillStyle = '#000';
-    ctx.fillText('INPUT', i.x, i.y + 20);
+    ctx.fillText('SWITCH', i.x - 32, i.y + 16);
+    
+    ctx.textAlign = 'center'; // reset
   });
   
   c.outputs.forEach(o => {
@@ -366,7 +400,7 @@ canvas.addEventListener('click', (e) => {
   
   const c = circuits[mode];
   c.inputs.forEach(i => {
-    if (x > i.x - 15 && x < i.x + 15 && y > i.y - 15 && y < i.y + 15) {
+    if (x > i.x - 35 && x < i.x + 15 && y > i.y - 30 && y < i.y + 30) {
       toggleInput(i.id);
     }
   });
