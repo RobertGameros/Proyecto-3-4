@@ -283,34 +283,36 @@ function draw() {
 }
 
 function drawLegendGrid(ctx) {
-  const startX = 650;
-  const startY = 480; // Bottom right area
-  const cellH = 20;
+  // Let's widen the legend. 
+  const startX = 600;
+  const startY = 480; 
+  const cellH = 30; // Bigger rows!
+  const totalW = 550;
   
   ctx.fillStyle = '#f0f0f0';
-  ctx.fillRect(startX, startY, 400, cellH * 5);
+  ctx.fillRect(startX, startY, totalW, cellH * 5);
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 1;
-  ctx.strokeRect(startX, startY, 400, cellH * 5);
+  ctx.strokeRect(startX, startY, totalW, cellH * 5);
   
   ctx.fillStyle = '#000';
-  ctx.font = 'bold 11px Arial';
+  ctx.font = 'bold 12px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('LEYENDA DE COMPONENTES', startX + 200, startY + 14);
+  ctx.fillText('LEYENDA DE COMPONENTES', startX + (totalW / 2), startY + 18);
   
-  ctx.beginPath(); ctx.moveTo(startX, startY + cellH); ctx.lineTo(startX + 400, startY + cellH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(startX, startY + cellH); ctx.lineTo(startX + totalW, startY + cellH); ctx.stroke();
   
   // Columns X offsets
   const col1 = startX;
-  const col2 = startX + 40;
-  const col3 = startX + 80;
-  const col4 = startX + 220;
-  const col5 = startX + 260;
-  const col6 = startX + 310;
+  const col2 = startX + 60;  // 60px for icon
+  const col3 = startX + 110; // 50px for short name
+  const col4 = startX + 310; // 200px for description
+  const col5 = startX + 370; // 60px for icon 2
+  const col6 = startX + 430; // 60px for short name 2
   
   const drawRow = (rowIdx, icon1, name1, desc1, icon2, name2, desc2) => {
     const y = startY + cellH * (rowIdx + 1);
-    ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(startX + 400, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(startX + totalW, y); ctx.stroke();
     
     // Vertical dividers
     ctx.beginPath();
@@ -322,35 +324,37 @@ function drawLegendGrid(ctx) {
     ctx.stroke();
 
     ctx.textAlign = 'left';
-    ctx.font = '11px Arial';
+    ctx.font = '12px Arial';
     ctx.fillStyle = '#000';
     
     // Draw Col 1
     if (name1) {
       if (icon1 === 'XOR' || icon1 === 'AND' || icon1 === 'OR' || icon1 === 'NOT') {
-        drawGate(ctx, { x: col1 + 25, y: y + 10, type: icon1 });
+        drawGate(ctx, { x: col1 + 30, y: y + 15, type: icon1 });
       }
-      ctx.fillText(name1, col2 + 5, y + 14);
-      ctx.fillText(desc1, col3 + 5, y + 14);
+      ctx.fillStyle = '#000';
+      ctx.fillText(name1, col2 + 8, y + 20);
+      ctx.fillText(desc1, col3 + 8, y + 20);
     }
     
     // Draw Col 2
     if (name2) {
       if (icon2 === 'PROBE') {
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(col4 + 20, y + 10, 6, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(col4 + 30, y + 15, 8, 0, 2*Math.PI); ctx.fill(); ctx.stroke();
       } else if (icon2 === 'INPUT') {
-        ctx.strokeRect(col4 + 10, y + 2, 16, 16);
-        ctx.beginPath(); ctx.arc(col4 + 18, y + 10, 2, 0, 2*Math.PI); ctx.fill();
+        ctx.strokeRect(col4 + 20, y + 7, 20, 16);
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.arc(col4 + 30, y + 15, 3, 0, 2*Math.PI); ctx.fill();
       } else if (icon2 === 'GROUND') {
-        ctx.beginPath(); ctx.moveTo(col4+20, y+4); ctx.lineTo(col4+20, y+10);
-        ctx.moveTo(col4+10, y+10); ctx.lineTo(col4+30, y+10);
-        ctx.moveTo(col4+14, y+13); ctx.lineTo(col4+26, y+13);
-        ctx.moveTo(col4+18, y+16); ctx.lineTo(col4+22, y+16);
+        ctx.beginPath(); ctx.moveTo(col4+30, y+5); ctx.lineTo(col4+30, y+15);
+        ctx.moveTo(col4+20, y+15); ctx.lineTo(col4+40, y+15);
+        ctx.moveTo(col4+24, y+20); ctx.lineTo(col4+36, y+20);
+        ctx.moveTo(col4+28, y+25); ctx.lineTo(col4+32, y+25);
         ctx.stroke();
       }
       ctx.fillStyle = '#000';
-      ctx.fillText(name2, col5 + 5, y + 14);
-      ctx.fillText(desc2, col6 + 5, y + 14);
+      ctx.fillText(name2, col5 + 8, y + 20);
+      ctx.fillText(desc2, col6 + 8, y + 20);
     }
   };
 
